@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <android.support.v7.preference.SwitchPreferenceCompat
+        android:defaultValue="true"
+        android:key="soft_17_pref"
+        android:title="@string/soft_17_title"
+        android:summary="@string/soft_17_summary"
+        />
+    <android.support.v7.preference.SwitchPreferenceCompat
+        android:defaultValue="true"
+        android:key="dub_after_split_pref"
+        android:title="@string/double_after_split_title"
+        android:summary="@string/double_after_split_summary"
+
+        />
+    <android.support.v7.preference.SwitchPreferenceCompat
+        android:defaultValue="true"
+        android:key="show_val_pref"
+        android:title="@string/show_val_pref_title"
+        android:summary="@string/show_val_pref_summary"
+
+        /></PreferenceScreen>

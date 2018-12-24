@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">BLACKJACK</string>
+    <string name="action_settings">Settings</string>
+    <string name="soft_17_summary">Dealer must hit on a soft 17</string>
+    <string name="soft_17_title">Hit on soft 17</string>
+    <string name="double_after_split_summary">Allow double down after split</string>
+    <string name="double_after_split_title">Double after split</string>
+    <string name="btn_hit_text">HIT</string>
+    <string name="btn_stay_txt">STAY</string>
+    <string name="dealer_card_string_soft_17_summary">Dealer Card @string/soft_17_summary</string>
+    <string name="dealer_card_2">Dealer Card 2</string>
+    <string name="player_card_1">Player Card 1</string>
+    <string name="player_card_string_dealer_card_2">Player Card @string/dealer_card_2</string>
+    <string name="show_val_pref_title">Show Hand Value</string>
+    <string name="show_val_pref_summary">Calculate and display the total numerical value of the hands</string>
+</resources>
