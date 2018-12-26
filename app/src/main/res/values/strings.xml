@@ -13,4 +13,5 @@
     <string name="player_card_string_dealer_card_2">Player Card @string/dealer_card_2</string>
     <string name="show_val_pref_title">Show Hand Value</string>
     <string name="show_val_pref_summary">Calculate and display the total numerical value of the hands</string>
+    <string name="dealer_card_3">Dealer Card 3</string>
 </resources>

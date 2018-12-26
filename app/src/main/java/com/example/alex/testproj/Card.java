@@ -22,7 +22,8 @@ public class Card {
         return value;
     }
 
-    public String getString()
+    @Override
+    public String toString()
     {
         String s = value + suit;
         return s;
@@ -46,30 +47,47 @@ public class Card {
     {
         int value = 0;
         int numAces = 0;
-        List<Card> hand = new ArrayList<Card>(h);
+        List<Card> hand = new ArrayList<>(h);
 
         //don't include the dealer's first hand in the display
-        if (dealer)
-            hand.remove(0);
 
-        for (Card c : hand)
+
+
+        for (int i = 0; i < hand.size(); i++)
         {
-            String val = c.getValue();
-            if (val == "A")
-                numAces += 1;
-            else if (val == "J" || val == "Q" || val == "K")
-                value += 10;
+            if (dealer)
+            {
+                if (i != 1)
+                {
+                    String val = hand.get(i).getValue();
+                    if (val == "A")
+                        numAces += 1;
+                    else if (val == "J" || val == "Q" || val == "K")
+                        value += 10;
+                    else
+                        value += Integer.parseInt(val);
+                }
+            }
             else
-                value += Integer.parseInt(val);
+            {
+                String val = hand.get(i).getValue();
+                if (val == "A")
+                    numAces += 1;
+                else if (val == "J" || val == "Q" || val == "K")
+                    value += 10;
+                else
+                    value += Integer.parseInt(val);
+            }
+
         }
 
         for (int i=0; i<numAces; i++)
-        {
-            if (value + 11 <= 21)
-                value += 11;
-            else
-                value += 1;
-        }
+            value += 1;
+
+        for (int i=0; i<numAces; i++)
+            if (value + 10 <= 21)
+                value += 10;
+
         if (dealer)
             Log.i("getHandValue", "Calculated value as " + value);
         return value;

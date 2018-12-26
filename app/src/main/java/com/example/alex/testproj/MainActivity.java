@@ -3,7 +3,11 @@ package com.example.alex.testproj;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
+import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -16,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,22 +40,21 @@ public class MainActivity extends AppCompatActivity {
     private ImageView dealerC2;
     private ImageView playerC1;
     private ImageView playerC2;
+    private List<ImageView> dealerCards;
+    private List<ImageView> playerCards;
     private SharedPreferences mPreferences;
     private String sharedPrefFile = "com.example.alex.testproj";
     private Map<String, Integer> map;
+    private ConstraintLayout layout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.i("start","onCreate");
         super.onCreate(savedInstanceState);
 
-        Log.i("start","setContentView");
         setContentView(R.layout.activity_main);
 
-        Log.i("start","get Toolbar");
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
-        Log.i("start","setSupportActionBar");
         setSupportActionBar(toolbar);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -73,69 +77,74 @@ public class MainActivity extends AppCompatActivity {
                 (SettingsActivity.SHOW_VAL_SWITCH, true);
 
 
-        mPreferences = getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
+        //mPreferences = getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
+        if (map == null)
+        {
+            map = new HashMap<>();
+            //Map image resources to card names"
+            map.put("AC", R.drawable.cac);
+            map.put("AD", R.drawable.cad);
+            map.put("AH", R.drawable.cah);
+            map.put("AS", R.drawable.cas);
+            map.put("2C", R.drawable.c2c);
+            map.put("2D", R.drawable.c2d);
+            map.put("2H", R.drawable.c2h);
+            map.put("2S", R.drawable.c2s);
+            map.put("3C", R.drawable.c3c);
+            map.put("3D", R.drawable.c3d);
+            map.put("3H", R.drawable.c3h);
+            map.put("3S", R.drawable.c3s);
+            map.put("4C", R.drawable.c4d);
+            map.put("4D", R.drawable.c4d);
+            map.put("4H", R.drawable.c4h);
+            map.put("4S", R.drawable.c4s);
+            map.put("5C", R.drawable.c5c);
+            map.put("5D", R.drawable.c5d);
+            map.put("5H", R.drawable.c5h);
+            map.put("5S", R.drawable.c5s);
+            map.put("6C", R.drawable.c6c);
+            map.put("6D", R.drawable.c6d);
+            map.put("6H", R.drawable.c6h);
+            map.put("6S", R.drawable.c6s);
+            map.put("7C", R.drawable.c7c);
+            map.put("7D", R.drawable.c7d);
+            map.put("7H", R.drawable.c7h);
+            map.put("7S", R.drawable.c7s);
+            map.put("8C", R.drawable.c8c);
+            map.put("8D", R.drawable.c8d);
+            map.put("8H", R.drawable.c8h);
+            map.put("8S", R.drawable.c8s);
+            map.put("9C", R.drawable.c9c);
+            map.put("9D", R.drawable.c9d);
+            map.put("9H", R.drawable.c9h);
+            map.put("9S", R.drawable.c9s);
+            map.put("10C", R.drawable.c0c);
+            map.put("10D", R.drawable.c0d);
+            map.put("10H", R.drawable.c0h);
+            map.put("10S", R.drawable.c0s);
+            map.put("AC", R.drawable.cac);
+            map.put("AD", R.drawable.cad);
+            map.put("AH", R.drawable.cah);
+            map.put("AS", R.drawable.cas);
+            map.put("JC", R.drawable.cjc);
+            map.put("JD", R.drawable.cjd);
+            map.put("JH", R.drawable.cjh);
+            map.put("JS", R.drawable.cjs);
+            map.put("QC", R.drawable.cqc);
+            map.put("QD", R.drawable.cqd);
+            map.put("QH", R.drawable.cqh);
+            map.put("QS", R.drawable.cqs);
+            map.put("KC", R.drawable.ckc);
+            map.put("KD", R.drawable.ckd);
+            map.put("KH", R.drawable.ckh);
+            map.put("KS", R.drawable.cks);
 
-        map = new HashMap<String, Integer>();
-        //Map image resources to card names"
-        map.put("AC", R.drawable.cac);
-        map.put("AD", R.drawable.cad);
-        map.put("AH", R.drawable.cah);
-        map.put("AS", R.drawable.cas);
-        map.put("2C", R.drawable.c2c);
-        map.put("2D", R.drawable.c2d);
-        map.put("2H", R.drawable.c2h);
-        map.put("2S", R.drawable.c2s);
-        map.put("3C", R.drawable.c3c);
-        map.put("3D", R.drawable.c3d);
-        map.put("3H", R.drawable.c3h);
-        map.put("3S", R.drawable.c3s);
-        map.put("4C", R.drawable.c4d);
-        map.put("4D", R.drawable.c4d);
-        map.put("4H", R.drawable.c4h);
-        map.put("4S", R.drawable.c4s);
-        map.put("5C", R.drawable.c5c);
-        map.put("5D", R.drawable.c5d);
-        map.put("5H", R.drawable.c5h);
-        map.put("5S", R.drawable.c5s);
-        map.put("6C", R.drawable.c6c);
-        map.put("6D", R.drawable.c6d);
-        map.put("6H", R.drawable.c6h);
-        map.put("6S", R.drawable.c6s);
-        map.put("7C", R.drawable.c7c);
-        map.put("7D", R.drawable.c7d);
-        map.put("7H", R.drawable.c7h);
-        map.put("7S", R.drawable.c7s);
-        map.put("8C", R.drawable.c8c);
-        map.put("8D", R.drawable.c8d);
-        map.put("8H", R.drawable.c8h);
-        map.put("8S", R.drawable.c8s);
-        map.put("9C", R.drawable.c9c);
-        map.put("9D", R.drawable.c9d);
-        map.put("9H", R.drawable.c9h);
-        map.put("9S", R.drawable.c9s);
-        map.put("10C", R.drawable.c0c);
-        map.put("10D", R.drawable.c0d);
-        map.put("10H", R.drawable.c0h);
-        map.put("10S", R.drawable.c0s);
-        map.put("AC", R.drawable.cac);
-        map.put("AD", R.drawable.cad);
-        map.put("AH", R.drawable.cah);
-        map.put("AS", R.drawable.cas);
-        map.put("JC", R.drawable.cjc);
-        map.put("JD", R.drawable.cjd);
-        map.put("JH", R.drawable.cjh);
-        map.put("JS", R.drawable.cjs);
-        map.put("QC", R.drawable.cqc);
-        map.put("QD", R.drawable.cqd);
-        map.put("QH", R.drawable.cqh);
-        map.put("QS", R.drawable.cqs);
-        map.put("KC", R.drawable.ckc);
-        map.put("KD", R.drawable.ckd);
-        map.put("KH", R.drawable.ckh);
-        map.put("KS", R.drawable.cks);
+        }
 
         Log.i("start","new Deck");
 
+        //grab references to views
+        layout = findViewById(R.id.layout);
         txtDealerVal = findViewById(R.id.txtDealerVal);
         txtPlayerVal = findViewById(R.id.txtPlayerVal);
         dealerC1 = findViewById(R.id.dealerC1View);
@@ -190,15 +199,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        SharedPreferences.Editor preferencesEditor = mPreferences.edit();
-
+       // SharedPreferences.Editor preferencesEditor = mPreferences.edit();
     }
+
     public void determineWinner()
     {
         //dealer is finished. show entire hand
         int dealer_true_val = Card.getHandValue(dealerHand, false);
-        dealerC1.setImageResource(map.get(dealerHand.get(0)));
-        dealerC2.setImageResource(map.get(dealerHand.get(1)));
+        dealerC1.setImageResource(map.get(dealerHand.get(0).toString()));
+        dealerC2.setImageResource(map.get(dealerHand.get(1).toString()));
         txtDealerVal.setText("" + dealer_true_val);
 
 
@@ -236,6 +245,40 @@ public class MainActivity extends AppCompatActivity {
 
     public void deal()
     {
+        ConstraintSet set = new ConstraintSet();
+        set.clone(layout);
+
+        if (dealerCards != null)
+        {
+            for (int i=2; i<dealerCards.size(); i++)
+            {
+                dealerCards.get(i).setVisibility(View.INVISIBLE);
+                layout.removeView(dealerCards.get(i));
+                set.clear(dealerCards.get(i).getId());
+
+            }
+        }
+
+        if (playerCards != null)
+        {
+            for (int i=2; i<playerCards.size(); i++)
+            {
+                playerCards.get(i).setVisibility(View.INVISIBLE);
+                layout.removeView(playerCards.get(i));
+                set.clear(playerCards.get(i).getId());
+            }
+        }
+        set.applyTo(layout);
+
+        dealerCards = new ArrayList<>();
+        dealerCards.add(dealerC1);
+        dealerCards.add(dealerC2);
+
+        playerCards = new ArrayList<>();
+        playerCards.add(playerC1);
+        playerCards.add(playerC2);
+
+
 
 
         playerHand = new ArrayList<Card>();
@@ -246,26 +289,62 @@ public class MainActivity extends AppCompatActivity {
         dealerHand.add(deck.pop());
         playerHand.add(deck.pop());
 
-        dealerC1.setImageResource(R.drawable.blue_back);
-        dealerC2.setImageResource(map.get(dealerHand.get(1).getString()));
-        playerC1.setImageResource(map.get(playerHand.get(0).getString()));
-        playerC2.setImageResource(map.get(playerHand.get(1).getString()));
+
+        dealerC1.setImageResource(map.get(dealerHand.get(0).toString()));
+        dealerC2.setImageResource(R.drawable.red_back);
+        playerC1.setImageResource(map.get(playerHand.get(0).toString()));
+        playerC2.setImageResource(map.get(playerHand.get(1).toString()));
 
 
         int dealerVal = Card.getHandValue(dealerHand, true);
+        int dealerTrueVal = Card.getHandValue(dealerHand, false);
         int playerVal = Card.getHandValue(playerHand, false);
 
         txtDealerVal.setText("" + dealerVal);
         txtPlayerVal.setText("" + playerVal);
 
-        if (playerVal == 21)
+        //check for natural blackjack
+        if (playerVal == 21 || dealerTrueVal == 21)
             determineWinner();
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     public void btnHitOnClick(View v) {
         playerHand.add(deck.pop());
         //txtPlayerHand.setText(Card.getStringRep(playerHand, false));
+        ImageView newPlayerCard = new ImageView(this);
+
+        newPlayerCard.setImageResource(map.get(playerHand.get(playerHand.size()-1).toString()));
+
+        newPlayerCard.setLayoutParams(new ConstraintLayout.LayoutParams(playerC1.getLayoutParams()));
+        newPlayerCard.setId(View.generateViewId());
+        newPlayerCard.setVisibility(View.VISIBLE);
+        newPlayerCard.setContentDescription("Player Hit Card");
+        int newCardId = newPlayerCard.getId();
+        playerCards.add(newPlayerCard);
+
+
+        ConstraintSet set = new ConstraintSet();
+        layout.addView(newPlayerCard);
+        set.clone(layout);
+
+        int startTopMargin = (int) (getResources().getDimension(R.dimen.player_c1_margintop));
+        int startSideMargin = (int) (getResources().getDimension(R.dimen.player_c1_marginside));
+        int cardSpread = (int) (getResources().getDimension(R.dimen.card_spread));
+        int cardNum = playerCards.size()-1;
+
+        int newCardTopMargin = startTopMargin + cardSpread * cardNum;
+        int newCardSideMargin = startSideMargin + cardSpread * cardNum;
+
+        set.connect(newCardId, ConstraintSet.TOP,
+                layout.getId(), ConstraintSet.TOP, newCardTopMargin);
+        set.connect(newCardId, ConstraintSet.LEFT,
+                layout.getId(), ConstraintSet.LEFT, newCardSideMargin);
+        set.applyTo(layout);
+
+        //playerC3.setImageResource(map.get(playerHand.get(2).toString()));
+        //playerC3.setVisibility(View.VISIBLE);
         int playerVal = Card.getHandValue(playerHand, false);
 
         txtPlayerVal.setText("" +  playerVal);
@@ -275,15 +354,44 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     public void btnStayOnClick(View v) {
         //dealer plays
         int dealer_true_val = Card.getHandValue(dealerHand, false);
-        //txtDealerHand.setText(Card.getStringRep(dealerHand, false));
 
         while (dealer_true_val < 17)
         {
             dealerHand.add(deck.pop());
             dealer_true_val = Card.getHandValue(dealerHand, false);
+
+            ImageView newDealerCard = new ImageView(this);
+            newDealerCard.setImageResource(map.get(playerHand.get(playerHand.size()-1).toString()));
+
+            newDealerCard.setLayoutParams(new ConstraintLayout.LayoutParams(dealerC1.getLayoutParams()));
+            newDealerCard.setId(View.generateViewId());
+            newDealerCard.setVisibility(View.VISIBLE);
+            newDealerCard.setContentDescription("Dealer Hit Card");
+            int newCardId = newDealerCard.getId();
+            dealerCards.add(newDealerCard);
+
+
+            ConstraintSet set = new ConstraintSet();
+            layout.addView(newDealerCard);
+            set.clone(layout);
+
+            int startTopMargin = (int) (getResources().getDimension(R.dimen.dealer_c1_margintop));
+            int startSideMargin = (int) (getResources().getDimension(R.dimen.dealer_c1_marginside));
+            int cardSpread = (int) (getResources().getDimension(R.dimen.card_spread));
+            int cardNum = dealerCards.size()-1;
+
+            int newCardTopMargin = startTopMargin + cardSpread * cardNum;
+            int newCardSideMargin = startSideMargin + cardSpread * cardNum;
+
+            set.connect(newCardId, ConstraintSet.TOP,
+                    layout.getId(), ConstraintSet.TOP, newCardTopMargin);
+            set.connect(newCardId, ConstraintSet.LEFT,
+                    layout.getId(), ConstraintSet.LEFT, newCardSideMargin);
+            set.applyTo(layout);
         }
 
 

@@ -1,5 +1,10 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
-    <dimen name="card_width">100dp</dimen>
-    <dimen name="card_height">156dp</dimen>
+    <dimen name="card_width">90dp</dimen>
+    <dimen name="card_height">140dp</dimen>
+    <dimen name="card_spread">22dp</dimen>
+    <dimen name="player_c1_marginside">60dp</dimen>
+    <dimen name="player_c1_margintop">240dp</dimen>
+    <dimen name="dealer_c1_marginside">60dp</dimen>
+    <dimen name="dealer_c1_margintop">16dp</dimen>
 </resources>
