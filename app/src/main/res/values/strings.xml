@@ -14,4 +14,10 @@
     <string name="show_val_pref_title">Show Hand Value</string>
     <string name="show_val_pref_summary">Calculate and display the total numerical value of the hands</string>
     <string name="dealer_card_3">Dealer Card 3</string>
+    <string name="bust_result">BUST! :(</string>
+    <string name="push_result">PUSH! :/</string>
+    <string name="win_result">WIN! :D</string>
+    <string name="lose_result">LOSE! :(</string>
+    <string name="blackjack_result">BLACKJACK! =D=D=D</string>
+    <string name="btn_double_text">DOUBLE</string>
 </resources>

@@ -1,8 +1,10 @@
 package com.example.alex.testproj;
 
+import android.annotation.TargetApi;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.icu.text.NumberFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -27,6 +29,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
     private Deck deck;
     private TextView txtPlayerVal;
     private TextView txtDealerVal;
+    private TextView txtPlayerFunds;
+    private TextView txtCurrentBet;
     private List<Card> playerHand;
     private List<Card> dealerHand;
     private ImageView dealerC1;
@@ -46,17 +51,27 @@ public class MainActivity extends AppCompatActivity {
     private String sharedPrefFile = "com.example.alex.testproj";
     private Map<String, Integer> map;
     private ConstraintLayout layout;
+    private Boolean soft17SwitchPref;
+    private Boolean doubleAfterSplitPref;
+    private Boolean showValPref;
+    private Double playerFunds = null;
+    private Double initialFunds = 500.00;
+    private Double betSize = 15.00;
+    private Double currentBet = 0.0;
+    public final int PLAYER=0;
+    public final int DEALER=1;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
 
         setSupportActionBar(toolbar);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -67,15 +82,17 @@ public class MainActivity extends AppCompatActivity {
         android.support.v7.preference.PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         SharedPreferences sharedPref = android.support.v7.preference.PreferenceManager
                 .getDefaultSharedPreferences(this);
-        Boolean soft17SwitchPref = sharedPref.getBoolean
+        soft17SwitchPref = sharedPref.getBoolean
                 (SettingsActivity.SOFT_17_SWITCH, false);
 
-        Boolean doubleAfterSplitPref = sharedPref.getBoolean
+        doubleAfterSplitPref = sharedPref.getBoolean
                 (SettingsActivity.DOUBLE_SPLIT_SWITCH, false);
 
-        Boolean showValPref = sharedPref.getBoolean
+        showValPref = sharedPref.getBoolean
                 (SettingsActivity.SHOW_VAL_SWITCH, true);
 
+        if (playerFunds == null)
+            playerFunds = initialFunds;
 
         //mPreferences = getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
         if (map == null)
@@ -147,10 +164,14 @@ public class MainActivity extends AppCompatActivity {
         layout = findViewById(R.id.layout);
         txtDealerVal = findViewById(R.id.txtDealerVal);
         txtPlayerVal = findViewById(R.id.txtPlayerVal);
+        txtPlayerFunds = findViewById(R.id.txtPlayerFunds);
+        txtCurrentBet = findViewById(R.id.txtCurrentBet);
         dealerC1 = findViewById(R.id.dealerC1View);
         dealerC2 = findViewById(R.id.dealerC2View);
         playerC1 = findViewById(R.id.playerC1View);
         playerC2 = findViewById(R.id.playerC2View);
+
+        setFundsDisplay();
 
         if (!showValPref)
         {
@@ -202,37 +223,60 @@ public class MainActivity extends AppCompatActivity {
        // SharedPreferences.Editor preferencesEditor = mPreferences.edit();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void setFundsDisplay()
+    {
+        txtPlayerFunds.setText("" + NumberFormat.getCurrencyInstance(Locale.US).format(playerFunds));
+        txtCurrentBet.setText("" + NumberFormat.getCurrencyInstance(Locale.US).format(currentBet));
+    }
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void determineWinner()
     {
         //dealer is finished. show entire hand
         int dealer_true_val = Card.getHandValue(dealerHand, false);
         dealerC1.setImageResource(map.get(dealerHand.get(0).toString()));
-        dealerC2.setImageResource(map.get(dealerHand.get(1).toString()));
-        txtDealerVal.setText("" + dealer_true_val);
+        Double winnings = 0.0;
 
 
         int player_val = Card.getHandValue(playerHand, false);
         String result = "";
 
         if (player_val > 21)
-            result = "BUST!\n:(";
-        else if (player_val == dealer_true_val)
-            result = "PUSH!\n:/";
-        else if (player_val > dealer_true_val || dealer_true_val > 21)
-            result = "WIN!\n:D";
+            result = getString(R.string.bust_result);
+        else if (player_val == dealer_true_val) {
+            result = getString(R.string.push_result);
+            winnings = currentBet;
+        }
+        else if (player_val > dealer_true_val || dealer_true_val > 21) {
+            result = getString(R.string.win_result);
+            winnings = currentBet * 2;
+        }
         else if (dealer_true_val > player_val)
-            result = "LOSE!\n:(";
+            result = getString(R.string.lose_result);
 
         if (player_val == 21 && playerHand.size() == 2 && !(dealer_true_val == 21 && dealerHand.size() != 2))
-            result = "BLACKJACK!\n=D=D=D";
+        {
+            result = getString(R.string.blackjack_result);
+            winnings = currentBet + currentBet * 1.5;
+        }
+
+        if (result != getString(R.string.bust_result))
+        {
+            dealerC2.setImageResource(map.get(dealerHand.get(1).toString()));
+            txtDealerVal.setText("" + dealer_true_val);
+        }
+
+        playerFunds += winnings;
+        currentBet = 0.0;
+        setFundsDisplay();
 
         AlertDialog.Builder myAlertBuilder = new AlertDialog.Builder(MainActivity.this);
-        myAlertBuilder.setTitle(result);
+        myAlertBuilder.setTitle(result + "     Payout: " + NumberFormat.getCurrencyInstance(Locale.US).format(winnings));
         myAlertBuilder.setMessage("");
-        myAlertBuilder.setPositiveButton("OK!", new DialogInterface.OnClickListener() {
+        myAlertBuilder.setPositiveButton("NEXT HAND", new DialogInterface.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             public void onClick(DialogInterface dialog, int which) {
                 deal();
-
             }
         });
 
@@ -243,11 +287,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void deal()
     {
         ConstraintSet set = new ConstraintSet();
         set.clone(layout);
 
+        //remove previous hand
         if (dealerCards != null)
         {
             for (int i=2; i<dealerCards.size(); i++)
@@ -270,102 +316,97 @@ public class MainActivity extends AppCompatActivity {
         }
         set.applyTo(layout);
 
-        dealerCards = new ArrayList<>();
-        dealerCards.add(dealerC1);
-        dealerCards.add(dealerC2);
-
-        playerCards = new ArrayList<>();
-        playerCards.add(playerC1);
-        playerCards.add(playerC2);
-
-
-
-
-        playerHand = new ArrayList<Card>();
-        dealerHand = new ArrayList<Card>();
-
-        dealerHand.add(deck.pop());
-        playerHand.add(deck.pop());
-        dealerHand.add(deck.pop());
-        playerHand.add(deck.pop());
-
-
-        dealerC1.setImageResource(map.get(dealerHand.get(0).toString()));
-        dealerC2.setImageResource(R.drawable.red_back);
-        playerC1.setImageResource(map.get(playerHand.get(0).toString()));
-        playerC2.setImageResource(map.get(playerHand.get(1).toString()));
-
-
-        int dealerVal = Card.getHandValue(dealerHand, true);
-        int dealerTrueVal = Card.getHandValue(dealerHand, false);
-        int playerVal = Card.getHandValue(playerHand, false);
-
-        txtDealerVal.setText("" + dealerVal);
-        txtPlayerVal.setText("" + playerVal);
-
-        //check for natural blackjack
-        if (playerVal == 21 || dealerTrueVal == 21)
-            determineWinner();
-
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
-    public void btnHitOnClick(View v) {
-        playerHand.add(deck.pop());
-        //txtPlayerHand.setText(Card.getStringRep(playerHand, false));
-        ImageView newPlayerCard = new ImageView(this);
-
-        newPlayerCard.setImageResource(map.get(playerHand.get(playerHand.size()-1).toString()));
-
-        newPlayerCard.setLayoutParams(new ConstraintLayout.LayoutParams(playerC1.getLayoutParams()));
-        newPlayerCard.setId(View.generateViewId());
-        newPlayerCard.setVisibility(View.VISIBLE);
-        newPlayerCard.setContentDescription("Player Hit Card");
-        int newCardId = newPlayerCard.getId();
-        playerCards.add(newPlayerCard);
-
-
-        ConstraintSet set = new ConstraintSet();
-        layout.addView(newPlayerCard);
-        set.clone(layout);
-
-        int startTopMargin = (int) (getResources().getDimension(R.dimen.player_c1_margintop));
-        int startSideMargin = (int) (getResources().getDimension(R.dimen.player_c1_marginside));
-        int cardSpread = (int) (getResources().getDimension(R.dimen.card_spread));
-        int cardNum = playerCards.size()-1;
-
-        int newCardTopMargin = startTopMargin + cardSpread * cardNum;
-        int newCardSideMargin = startSideMargin + cardSpread * cardNum;
-
-        set.connect(newCardId, ConstraintSet.TOP,
-                layout.getId(), ConstraintSet.TOP, newCardTopMargin);
-        set.connect(newCardId, ConstraintSet.LEFT,
-                layout.getId(), ConstraintSet.LEFT, newCardSideMargin);
-        set.applyTo(layout);
-
-        //playerC3.setImageResource(map.get(playerHand.get(2).toString()));
-        //playerC3.setVisibility(View.VISIBLE);
-        int playerVal = Card.getHandValue(playerHand, false);
-
-        txtPlayerVal.setText("" +  playerVal);
-
-        if (playerVal > 21)
-            determineWinner();
-
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
-    public void btnStayOnClick(View v) {
-        //dealer plays
-        int dealer_true_val = Card.getHandValue(dealerHand, false);
-
-        while (dealer_true_val < 17)
+        //if player has money, deal new cards
+        if (playerFunds - betSize > 0)
         {
-            dealerHand.add(deck.pop());
-            dealer_true_val = Card.getHandValue(dealerHand, false);
+            playerFunds -= betSize;
+            currentBet += betSize;
+            setFundsDisplay();
 
+            dealerCards = new ArrayList<>();
+            dealerCards.add(dealerC1);
+            dealerCards.add(dealerC2);
+
+            playerCards = new ArrayList<>();
+            playerCards.add(playerC1);
+            playerCards.add(playerC2);
+
+
+
+
+            playerHand = new ArrayList<Card>();
+            dealerHand = new ArrayList<Card>();
+
+            playerHand.add(deck.pop());
+            dealerHand.add(deck.pop());
+            playerHand.add(deck.pop());
+            dealerHand.add(deck.pop());
+
+            //manually deal cards
+            //dealerHand.add(new Card("H", "A"));
+            //dealerHand.add(new Card("S", "6"));
+
+
+            dealerC1.setImageResource(map.get(dealerHand.get(0).toString()));
+            dealerC2.setImageResource(R.drawable.red_back);
+            playerC1.setImageResource(map.get(playerHand.get(0).toString()));
+            playerC2.setImageResource(map.get(playerHand.get(1).toString()));
+
+
+            int dealerVal = Card.getHandValue(dealerHand, true);
+            int dealerTrueVal = Card.getHandValue(dealerHand, false);
+            int playerVal = Card.getHandValue(playerHand, false);
+
+            txtDealerVal.setText("" + dealerVal);
+            txtPlayerVal.setText("" + playerVal);
+
+            //check for natural blackjack
+            if (playerVal == 21 || dealerTrueVal == 21)
+                determineWinner();
+        }
+
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    public void updateHandDisplay(int player)
+    {
+        if (player == PLAYER)
+        {
+            ImageView newPlayerCard = new ImageView(this);
+
+            newPlayerCard.setImageResource(map.get(playerHand.get(playerHand.size()-1).toString()));
+
+            newPlayerCard.setLayoutParams(new ConstraintLayout.LayoutParams(playerC1.getLayoutParams()));
+            newPlayerCard.setId(View.generateViewId());
+            newPlayerCard.setVisibility(View.VISIBLE);
+            newPlayerCard.setContentDescription("Player Hit Card");
+            int newCardId = newPlayerCard.getId();
+            playerCards.add(newPlayerCard);
+
+
+            ConstraintSet set = new ConstraintSet();
+            layout.addView(newPlayerCard);
+            set.clone(layout);
+
+            int startTopMargin = (int) (getResources().getDimension(R.dimen.player_c1_margintop));
+            int startSideMargin = (int) (getResources().getDimension(R.dimen.player_c1_marginside));
+            int cardSpread = (int) (getResources().getDimension(R.dimen.card_spread));
+            int cardNum = playerCards.size()-1;
+
+            int newCardTopMargin = startTopMargin + cardSpread * cardNum;
+            int newCardSideMargin = startSideMargin + cardSpread * cardNum;
+
+            set.connect(newCardId, ConstraintSet.TOP,
+                    layout.getId(), ConstraintSet.TOP, newCardTopMargin);
+            set.connect(newCardId, ConstraintSet.LEFT,
+                    layout.getId(), ConstraintSet.LEFT, newCardSideMargin);
+            set.applyTo(layout);
+        }
+        if (player == DEALER)
+        {
             ImageView newDealerCard = new ImageView(this);
-            newDealerCard.setImageResource(map.get(playerHand.get(playerHand.size()-1).toString()));
+            newDealerCard.setImageResource(map.get(dealerHand.get(dealerHand.size()-1).toString()));
 
             newDealerCard.setLayoutParams(new ConstraintLayout.LayoutParams(dealerC1.getLayoutParams()));
             newDealerCard.setId(View.generateViewId());
@@ -393,11 +434,52 @@ public class MainActivity extends AppCompatActivity {
                     layout.getId(), ConstraintSet.LEFT, newCardSideMargin);
             set.applyTo(layout);
         }
+    }
+    @TargetApi(Build.VERSION_CODES.N)
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    public void btnHitOnClick(View v) {
+        playerHand.add(deck.pop());
 
+        updateHandDisplay(PLAYER);
+        int playerVal = Card.getHandValue(playerHand, false);
 
+        txtPlayerVal.setText("" +  playerVal);
 
+        if (playerVal > 21)
+            determineWinner();
 
+    }
 
+    @TargetApi(Build.VERSION_CODES.N)
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    public void btnStayOnClick(View v) {
+        //dealer plays
+        int dealer_true_val = Card.getHandValue(dealerHand, false);
+        Boolean softHand = Card.isHandValueSoft(dealerHand);
+        while (dealer_true_val < 17 || (dealer_true_val < 18 && soft17SwitchPref && softHand))
+        {
+            dealerHand.add(deck.pop());
+            softHand = Card.isHandValueSoft(dealerHand);
+            dealer_true_val = Card.getHandValue(dealerHand, false);
+            updateHandDisplay(DEALER);
+
+        }
         determineWinner();
+    }
+
+    @TargetApi(Build.VERSION_CODES.N)
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    public void btnDoubleOnClick(View view) {
+        if (playerFunds - betSize > 0)
+        {
+            playerFunds -= betSize;
+            currentBet += betSize;
+            playerHand.add(deck.pop());
+            updateHandDisplay(PLAYER);
+            int playerVal = Card.getHandValue(playerHand, false);
+            txtPlayerVal.setText("" + playerVal);
+            determineWinner();
+
+        }
     }
 }
