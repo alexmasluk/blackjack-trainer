@@ -95,7 +95,7 @@
         android:layout_height="@dimen/txtFundsHeight"
         android:layout_marginEnd="@dimen/bet_DisplaySideMargin"
         android:layout_marginRight="@dimen/bet_DisplaySideMargin"
-        android:layout_marginBottom="84dp"
+        android:layout_marginBottom="140dp"
         android:ems="10"
         android:textColor="@android:color/white"
         android:textStyle="bold"
@@ -111,10 +111,10 @@
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
         android:clickable="true"
+        android:focusable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@color/colorAccent"
-        android:focusable="true" />
+        app:srcCompat="@color/colorAccent" />
 
     <ImageView
         android:id="@+id/dealerC1View"

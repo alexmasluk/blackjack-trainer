@@ -19,5 +19,6 @@
     <string name="win_result">WIN! :D</string>
     <string name="lose_result">LOSE! :(</string>
     <string name="blackjack_result">BLACKJACK! =D=D=D</string>
-    <string name="btn_double_text">DOUBLE</string>
+    <string name="btn_double_text">DUB</string>
+    <string name="btn_split_text">SPLIT</string>
 </resources>

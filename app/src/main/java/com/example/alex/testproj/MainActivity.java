@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Matrix;
 import android.icu.text.NumberFormat;
 import android.os.Build;
 import android.os.Bundle;
@@ -35,25 +36,14 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
 
     private Deck deck;
-    private TextView txtPlayerVal;
-    private TextView txtDealerVal;
-    private TextView txtPlayerFunds;
-    private TextView txtCurrentBet;
-    private List<Card> playerHand;
-    private List<Card> dealerHand;
-    private ImageView dealerC1;
-    private ImageView dealerC2;
-    private ImageView playerC1;
-    private ImageView playerC2;
-    private List<ImageView> dealerCards;
-    private List<ImageView> playerCards;
-    private SharedPreferences mPreferences;
-    private String sharedPrefFile = "com.example.alex.testproj";
+    private Button btnDouble, btnHit, btnStay, btnSplit;
+    private TextView txtPlayerVal, txtDealerVal, txtPlayerFunds, txtCurrentBet;
+    private List<Card> playerHand, dealerHand;
+    private ImageView dealerC1, dealerC2, playerC1, playerC2;
+    private List<ImageView> dealerCards, playerCards;
     private Map<String, Integer> map;
     private ConstraintLayout layout;
-    private Boolean soft17SwitchPref;
-    private Boolean doubleAfterSplitPref;
-    private Boolean showValPref;
+    private Boolean soft17SwitchPref, doubleAfterSplitPref, showValPref;
     private Double playerFunds = null;
     private Double initialFunds = 500.00;
     private Double betSize = 15.00;
@@ -170,9 +160,15 @@ public class MainActivity extends AppCompatActivity {
         dealerC2 = findViewById(R.id.dealerC2View);
         playerC1 = findViewById(R.id.playerC1View);
         playerC2 = findViewById(R.id.playerC2View);
-
+        btnDouble = findViewById(R.id.btnDouble);
+        btnHit = findViewById(R.id.btnHit);
+        btnStay = findViewById(R.id.btnStay);
         setFundsDisplay();
 
+        playerC1.setVisibility(View.INVISIBLE);
+        dealerC1.setVisibility(View.INVISIBLE);
+        playerC2.setVisibility(View.INVISIBLE);
+        dealerC2.setVisibility(View.INVISIBLE);
         if (!showValPref)
         {
             txtDealerVal.setVisibility(View.INVISIBLE);
@@ -186,9 +182,7 @@ public class MainActivity extends AppCompatActivity {
 
         Log.i("start","deal");
         deck = new Deck(4);
-        deal();
-
-
+        toggleButtons(true);
     }
 
 
@@ -217,10 +211,11 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-       // SharedPreferences.Editor preferencesEditor = mPreferences.edit();
+    public void toggleButtons(Boolean enabled)
+    {
+        btnHit.setEnabled(enabled);
+        btnDouble.setEnabled(enabled);
+        btnStay.setEnabled(enabled);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -353,6 +348,10 @@ public class MainActivity extends AppCompatActivity {
             playerC2.setImageResource(map.get(playerHand.get(1).toString()));
 
 
+            playerC1.setVisibility(View.VISIBLE);
+            dealerC1.setVisibility(View.VISIBLE);
+            playerC2.setVisibility(View.VISIBLE);
+            dealerC2.setVisibility(View.VISIBLE);
             int dealerVal = Card.getHandValue(dealerHand, true);
             int dealerTrueVal = Card.getHandValue(dealerHand, false);
             int playerVal = Card.getHandValue(playerHand, false);
@@ -360,12 +359,47 @@ public class MainActivity extends AppCompatActivity {
             txtDealerVal.setText("" + dealerVal);
             txtPlayerVal.setText("" + playerVal);
 
+            toggleButtons(true);
             //check for natural blackjack
             if (playerVal == 21 || dealerTrueVal == 21)
                 determineWinner();
         }
 
 
+    }
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    public void updateHandDisplay(Boolean double_down)
+    {
+        ImageView newPlayerCard = new ImageView(this);
+        newPlayerCard.setRotation(90);
+
+        newPlayerCard.setImageResource(map.get(playerHand.get(playerHand.size()-1).toString()));
+
+        newPlayerCard.setLayoutParams(new ConstraintLayout.LayoutParams(playerC1.getLayoutParams()));
+        newPlayerCard.setId(View.generateViewId());
+        newPlayerCard.setVisibility(View.VISIBLE);
+        newPlayerCard.setContentDescription("Player Hit Card");
+        int newCardId = newPlayerCard.getId();
+        playerCards.add(newPlayerCard);
+
+
+        ConstraintSet set = new ConstraintSet();
+        layout.addView(newPlayerCard);
+        set.clone(layout);
+
+        int startTopMargin = (int) (getResources().getDimension(R.dimen.player_c1_margintop));
+        int startSideMargin = (int) (getResources().getDimension(R.dimen.player_c1_marginside));
+        int cardSpread = (int) (getResources().getDimension(R.dimen.card_spread));
+        int cardNum = playerCards.size()-1;
+
+        int newCardTopMargin = startTopMargin + cardSpread * cardNum + 10;
+        int newCardSideMargin = startSideMargin + cardSpread * cardNum - 30;
+
+        set.connect(newCardId, ConstraintSet.TOP,
+                layout.getId(), ConstraintSet.TOP, newCardTopMargin);
+        set.connect(newCardId, ConstraintSet.LEFT,
+                layout.getId(), ConstraintSet.LEFT, newCardSideMargin);
+        set.applyTo(layout);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -435,9 +469,19 @@ public class MainActivity extends AppCompatActivity {
             set.applyTo(layout);
         }
     }
+
     @TargetApi(Build.VERSION_CODES.N)
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     public void btnHitOnClick(View v) {
+      Hit();
+
+    }
+
+    @TargetApi(Build.VERSION_CODES.N)
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    public void Hit()
+    {
+        btnDouble.setEnabled(false);
         playerHand.add(deck.pop());
 
         updateHandDisplay(PLAYER);
@@ -447,12 +491,20 @@ public class MainActivity extends AppCompatActivity {
 
         if (playerVal > 21)
             determineWinner();
-
     }
 
     @TargetApi(Build.VERSION_CODES.N)
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     public void btnStayOnClick(View v) {
+        Stay();
+
+    }
+
+    @TargetApi(Build.VERSION_CODES.N)
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    public void Stay()
+    {
+        toggleButtons(false);
         //dealer plays
         int dealer_true_val = Card.getHandValue(dealerHand, false);
         Boolean softHand = Card.isHandValueSoft(dealerHand);
@@ -475,11 +527,10 @@ public class MainActivity extends AppCompatActivity {
             playerFunds -= betSize;
             currentBet += betSize;
             playerHand.add(deck.pop());
-            updateHandDisplay(PLAYER);
+            updateHandDisplay(true);
             int playerVal = Card.getHandValue(playerHand, false);
             txtPlayerVal.setText("" + playerVal);
-            determineWinner();
-
+            Stay();
         }
     }
 }
