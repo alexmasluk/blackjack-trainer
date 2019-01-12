@@ -2,9 +2,9 @@ Blackjack Trainer
 =================
 
 It's well know that Blackjack offers more advantageous odds for the player than other casino games. Maximizing the player's odds involves knowing when to make the appropriate move:
-+ Hit
-+ Stay
-+ Double Down
++	Hit
++	Stay
++	Double Down
 + Split
 + Insure
 + Surrender
