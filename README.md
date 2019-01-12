@@ -4,20 +4,20 @@ Blackjack Trainer
 It's well know that Blackjack offers more advantageous odds for the player than other casino games. Maximizing the player's odds involves knowing when to make the appropriate move:
   - Hit
   - Stay
-  * Double Down
-  * Split
-  * Insure
-  * Surrender
+  - Double Down
+  - Split
+  - Insure
+  - Surrender
 
 There are two factors that determine which move is most statistically advantageous. They are **the value of the dealt cards** and **the house rules**. One may consult numerous tables which recommend a move after considering these various factors. For example, from bestonlinecasino.com:
 
 ![table example](https://www.bestonlinecasino.com/images/strategy/blackjack-hit-or-stand-hard-chart.jpg)
 
 These values change slightly depending on the house rules:
-*Is the dealer required to **hit** or **stay** on a soft 17?
-*Can the player double down after a split?
-*Does the casino allow early surrender?
-*How many decks comprise the shoe? 
+ * Is the dealer required to **hit** or **stay** on a soft 17?
+ * Can the player double down after a split?
+ * Does the casino allow early surrender?
+ * How many decks comprise the shoe? 
 
 Memorizing all these tables seems like an obnoxious proposition, so why not code them into an app and learn by actually playing the game? This seemed like a straightforward way to learn the rudiments of Android app development. 
 
