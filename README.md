@@ -2,12 +2,12 @@ Blackjack Trainer
 =================
 
 It's well know that Blackjack offers more advantageous odds for the player than other casino games. Maximizing the player's odds involves knowing when to make the appropriate move:
-- Hit
-- Stay
-- Double Down
-- Split
-- Insure
-- Surrender
++ Hit
++ Stay
++ Double Down
++ Split
++ Insure
++ Surrender
 
 There are two factors that determine which move is most statistically advantageous. They are **the value of the dealt cards** and **the house rules**. One may consult numerous tables which recommend a move after considering these various factors. For example, from bestonlinecasino.com:
 
