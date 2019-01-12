@@ -23,10 +23,15 @@ Memorizing all these tables seems like an obnoxious proposition, so why not code
 
 What it does **so far**:
 + Play Blackjack against the house with a 4-deck shoe
+
 + Hit, stay, or double down
+
 + Win and lose virtual money
+
 + Optionally display the value of each hand 
+
 + Optionally allow dealer to hit on soft 17
+
 
 What it **will do**:
 + Allow player to split, surrender, and insure
